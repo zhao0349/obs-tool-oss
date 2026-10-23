@@ -1,0 +1,71 @@
+name: Build Windows preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-2025
+    timeout-minutes: 60
+    env:
+      PYTHONUTF8: '1'
+      PYTHONIOENCODING: utf-8
+      PYTHONDONTWRITEBYTECODE: '1'
+      OBS_SETTINGS_DIR: ${{ github.workspace }}/validation/release/settings
+      OBS_JOB_DIR: ${{ github.workspace }}/validation/release/jobs
+      OBS_RECORDS_DIR: ${{ github.workspace }}/validation/release/records
+      OBS_LOG_DIR: ${{ github.workspace }}/validation/release/logs
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12.10'
+      - name: Install locked build dependencies
+        shell: pwsh
+        run: |
+          python -m venv .venv-obs-release
+          ./.venv-obs-release/Scripts/python.exe -m pip install -r requirements.lock
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          ./.venv-obs-release/Scripts/python.exe -m pip check
+          exit $LASTEXITCODE
+      - name: Build and audit onefile
+        shell: pwsh
+        run: ./scripts/build.ps1 -Mode onefile -OutputDir build/preview -ReportDir validation/release/build
+      - name: Verify compiled synthetic results and prepare delivery
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = Join-Path $PWD 'src'
+          ./.venv-obs-release/Scripts/python.exe scripts/verify_preview.py build/preview validation/release
+          exit $LASTEXITCODE
+      - name: Upload verified delivery and evidence
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: windows-preview-${{ github.sha }}
+          path: |
+            dist/*
+            validation/release/build/*audit.json
+            validation/release/compiled-comparison.json
+            validation/release/verification.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        with:
+          name: preview-diagnostics-${{ github.sha }}
+          path: |
+            validation/release/build/nuitka-report.xml
+            validation/release/build/build.log
+            validation/release/build/*audit.json
+            validation/release/*comparison.json
+          if-no-files-found: ignore
+          retention-days: 14

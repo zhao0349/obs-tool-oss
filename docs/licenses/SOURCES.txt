@@ -1,0 +1,9 @@
+Qt/PySide6 6.8.3 上游对应源码下载地址及归档校验值，供识别具体版本。发行时按实际许可要求提供对应源码的获取方式。
+QtBase / QtSvg: https://download.qt.io/archive/qt/6.8/6.8.3/submodules/
+PySide/shiboken: https://download.qt.io/official_releases/QtForPython/pyside6/PySide6-6.8.3-src/
+pyside-setup-everywhere-src-6.8.3.tar.xz SHA256=d2c896f7f1a6a7ea4c9f98cfe317272fd139703ddf612b86999f09e48aeef0e6
+qtbase-everywhere-src-6.8.3.tar.xz SHA256=56001b905601bb9023d399f3ba780d7fa940f3e4861e496a7c490331f49e0b80
+qtsvg-everywhere-src-6.8.3.tar.xz SHA256=35eb516460f00f264eb504baa253432384351cf23fb9980a5857190e8deef438
+OpenSSL license: https://raw.githubusercontent.com/openssl/openssl/openssl-3.5.8/LICENSE.txt
+libffi license: https://raw.githubusercontent.com/libffi/libffi/v3.4.4/LICENSE
+Nuitka licenses: installed Nuitka 4.3 dist-info/licenses; runtime exception retained.

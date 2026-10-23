@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools==84.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "obs-local-tool"
+version = "0.6.0"
+description = "OBS 数据处理工具"
+authors = [{name = "zhao0349", email = "zxy0349@qq.com"}]
+readme = "README.md"
+license = "GPL-3.0-or-later AND CC-BY-NC-SA-4.0"
+license-files = ["LICENSE", "ASSET_LICENSE.md", "docs/THIRD_PARTY_NOTICES.md", "docs/licenses/**/*"]
+requires-python = ">=3.11,<3.13"
+dependencies = ["PySide6==6.8.3"]
+
+[project.optional-dependencies]
+build = ["Nuitka==4.3", "ordered-set==4.1.0", "zstandard==0.25.0", "ziglang==0.16.0"]
+
+[project.gui-scripts]
+obs-desktop = "obs_tool.gui:main"
+
+[project.urls]
+Author = "https://github.com/zhao0349"
+License = "https://github.com/zhao0349/obs-tool-oss/blob/main/LICENSE"
+Repository = "https://github.com/zhao0349/obs-tool-oss"
+Issues = "https://github.com/zhao0349/obs-tool-oss/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+obs_tool = ["assets/*.svg", "assets/branding/*.png"]
+
+[tool.black]
+line-length = 88
+target-version = ["py311", "py312"]

@@ -1,0 +1,9 @@
+Nuitka==4.3
+ordered-set==4.1.0
+PySide6==6.8.3
+PySide6_Addons==6.8.3
+PySide6_Essentials==6.8.3
+shiboken6==6.8.3
+zstandard==0.25.0
+setuptools==84.0.0
+ziglang==0.16.0

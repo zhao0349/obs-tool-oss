@@ -1,0 +1,88 @@
+name: Windows tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  atomic-write-posix:
+    name: POSIX atomic write regression
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Test curve context and simulated Windows record lock
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = Join-Path $PWD 'src'
+          $env:OBS_RECORDS_DIR = Join-Path $PWD 'validation/ci-posix/records'
+          $env:TMPDIR = Join-Path $PWD 'validation/ci-posix/tmp'
+          New-Item -ItemType Directory -Force $env:TMPDIR | Out-Null
+          python -B -m unittest discover -s tests -p test_curve_context.py -v
+          exit $LASTEXITCODE
+      - name: Remove temporary test files
+        if: always()
+        shell: pwsh
+        run: |
+          $root = [IO.Path]::GetFullPath($env:GITHUB_WORKSPACE)
+          $target = [IO.Path]::GetFullPath((Join-Path $root 'validation/ci-posix'))
+          if (-not $target.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::Ordinal)) { throw 'Invalid cleanup path' }
+          if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Recurse -Force }
+  test:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONUTF8: '1'
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Install locked runtime dependencies
+        shell: pwsh
+        run: |
+          python -m venv .venv-obs-release
+          ./.venv-obs-release/Scripts/python.exe -m pip install --constraint requirements.lock --no-build-isolation --no-deps PySide6==6.8.3 PySide6_Addons==6.8.3 PySide6_Essentials==6.8.3 shiboken6==6.8.3
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Test source with isolated synthetic data
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = Join-Path $PWD 'src'
+          $env:OBS_SETTINGS_DIR = Join-Path $PWD 'validation/ci/settings'
+          $env:OBS_JOB_DIR = Join-Path $PWD 'validation/ci/jobs'
+          $env:OBS_RECORDS_DIR = Join-Path $PWD 'validation/ci/records'
+          $env:OBS_LOG_DIR = Join-Path $PWD 'validation/ci/logs'
+          $env:TEMP = Join-Path $PWD 'validation/ci/tmp'
+          $env:TMP = $env:TEMP
+          New-Item -ItemType Directory -Force $env:TEMP | Out-Null
+          ./.venv-obs-release/Scripts/python.exe -m unittest discover -s tests -v
+          exit $LASTEXITCODE
+      - name: Remove temporary test files
+        if: always()
+        shell: pwsh
+        run: |
+          $root = [IO.Path]::GetFullPath($env:GITHUB_WORKSPACE)
+          $target = [IO.Path]::GetFullPath((Join-Path $root 'validation/ci'))
+          if (-not $target.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) { throw 'Invalid cleanup path' }
+          if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Recurse -Force }

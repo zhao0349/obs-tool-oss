@@ -1,0 +1,36 @@
+.venv*/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+validation/
+results/
+assets/branding/*.zip
+
+# Local credentials and machine configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+.ssh/
+
+# User data and generated output
+*.dat
+*.DAT
+*.bak
+*.bak.*
+*.exe
+*.msi
+*.log
+Thumbs.db
+.DS_Store
+
+# Local IDE settings
+.idea/
