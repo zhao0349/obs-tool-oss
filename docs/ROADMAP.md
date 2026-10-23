@@ -1,6 +1,6 @@
 # 当前状态与维护边界
 
-当前源码的作者署名统一为 [zhao0349](https://github.com/zhao0349)，联系邮箱为 [zxy0349@qq.com](mailto:zxy0349@qq.com)；“帮助→关于”提供项目、Issues、代码/图标许可和第三方声明入口。Windows AppUserModelID 已改为 `zhao0349.OBSDataTool`；旧版任务栏固定项与新版分组、是否需要重新固定仍待目标环境验证。此变更尚未重新打包，已发布文件不随源码更新。本机原生 Windows Qt（125% 缩放）已检查关于页默认/缩小窗口外观及 7 个链接的点击目标，使用帮助正文保持原样；这不代替发行物和多屏验收。
+作者为 [zhao0349](https://github.com/zhao0349)，联系邮箱为 [zxy0349@qq.com](mailto:zxy0349@qq.com)；“帮助→关于”提供项目、Issues、代码/图标许可和第三方声明入口。Windows AppUserModelID 为 `zhao0349.OBSDataTool`；任务栏分组与固定项行为仍待目标环境验证。
 
 本页只保留当前状态、长期约定和未完成事项。功能细节见 [USER_GUIDE](USER_GUIDE.md)，算法见 [ALGORITHM](ALGORITHM.md)，开发与验证流程见 [DEVELOPMENT](DEVELOPMENT.md)。具体变更及验证结果通过本仓库的 PR 和提交追溯。
 
